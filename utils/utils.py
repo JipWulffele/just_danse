@@ -1,7 +1,26 @@
 import time
 import cv2
+import json
+import os
 
-IMG_START_POSITION = cv2.imread("assets/images/start_position.png")
+IMG_START_POSITION = cv2.imread("assets/images/icon_start.png")
+
+def load_icons(config_path):
+    """
+    Loads icons from JSON config and returns a list of icon info with images.
+    """
+    with open(config_path, "r") as f:
+        data = json.load(f)
+
+    # Base path for images
+    base_path = os.path.join(os.path.dirname(config_path), "../images")
+
+    for icon_cfg in data["icons"]:
+        icon_file = os.path.join(base_path, os.path.basename(icon_cfg["file"]))
+        icon_cfg["image"] = cv2.imread(icon_file, cv2.IMREAD_UNCHANGED)
+        if icon_cfg["image"] is None:
+            print(f"[WARNING] Failed to load icon: {icon_file}")
+    return data
 
 
 def wait_for_person(video, detector, visualizer):
