@@ -1,0 +1,34 @@
+{
+  "icons": [
+    {
+      "file": "./images/icon_turn.png",
+      "start": 0,
+      "end": 1.5,
+      "size": [200, 200]
+    },
+    {
+      "file": "./images/icon_stamp.png",
+      "start": 1.5,
+      "end": 3,
+      "size": [200, 200]
+    },
+    {
+      "file": "./images/icon_wave.png",
+      "start": 3,
+      "end": 5,
+      "size": [200, 200]
+    },
+    {
+      "file": "./images/icon_squat.png",
+      "start": 5,
+      "end": 6,
+      "size": [200, 200]
+    },
+    {
+      "file": "./images/icon_squat_turn.png",
+      "start": 6,
+      "end": 13,
+      "size": [200, 200]
+    }
+  ]
+}
