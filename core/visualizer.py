@@ -39,30 +39,44 @@ class Visualizer:
     def draw_end_message(self, frame, text=None):
         h, w, _ = frame.shape
 
-        # --- Add semi-transparent colorful overlay ---
+        # --- Semi-transparent overlay ---
         overlay = frame.copy()
-        cv2.rectangle(overlay, (50, 50), (w-50, h-50), (84, 0, 255), -1)   # deep blue base
+        cv2.rectangle(overlay, (50, 50), (w-50, h-50), (84, 0, 255), -1)
         alpha = 0.6
         frame = cv2.addWeighted(overlay, alpha, frame, 1 - alpha, 0)
 
-        # --- Add festive border (bright yellow) ---
+        # --- Festive border ---
         cv2.rectangle(frame, (40, 40), (w-40, h-40), (0, 189, 255), 10)
 
         if text:
             text = self.score_to_text(text, 0, 1)
-            
-            # --- Draw outlined, colorful score text ---
-            font = cv2.FONT_HERSHEY_SIMPLEX
             score_text = f"Your Score: {text}"
 
-            # Shadow/outline (black, thicker)
-            cv2.putText(frame, score_text, (100, 150), font, 2.5, (255, 255, 255), 8, cv2.LINE_AA)
-            # Main text (bright green)
-            cv2.putText(frame, score_text, (100, 150), font, 2.5, (153, 0, 57), 5, cv2.LINE_AA)
+            font = cv2.FONT_HERSHEY_SIMPLEX
+            thickness = 4
+            max_width = w - 200  # max width inside rectangle
+            font_scale = 2.5     # initial guess
 
-            # --- Add festive message ---
+            # Reduce font_scale until text fits
+            (text_w, text_h), baseline = cv2.getTextSize(score_text, font, font_scale, thickness)
+            while text_w > max_width and font_scale > 0.5:
+                font_scale -= 0.1
+                (text_w, text_h), baseline = cv2.getTextSize(score_text, font, font_scale, thickness)
+
+            # Draw shadow/outline
+            cv2.putText(frame, score_text, (100, 150), font, font_scale, (255, 255, 255), thickness+2, cv2.LINE_AA)
+            # Draw main text
+            cv2.putText(frame, score_text, (100, 150), font, font_scale, (153, 0, 57), thickness, cv2.LINE_AA)
+
+            # Festive message below
             message = "Press ENTER to quit | Press D to dance again"
-            cv2.putText(frame, message, (100, h - 100), font, 1.2, (255, 255, 255), 3, cv2.LINE_AA)
+            msg_font_scale = 1.2
+            (msg_w, msg_h), _ = cv2.getTextSize(message, font, msg_font_scale, 3)
+            # Optionally shrink message if too wide
+            while msg_w > w - 200 and msg_font_scale > 0.5:
+                msg_font_scale -= 0.1
+                (msg_w, msg_h), _ = cv2.getTextSize(message, font, msg_font_scale, 3)
+            cv2.putText(frame, message, (100, h - 100), font, msg_font_scale, (255, 255, 255), 3, cv2.LINE_AA)
 
         return frame
     
