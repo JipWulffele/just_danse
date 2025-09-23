@@ -1,3 +1,5 @@
+import random
+
 class DanceJudge:
     def __init__(self):
         self.score = 0
@@ -8,6 +10,6 @@ class DanceJudge:
         landmarks: list of MediaPipe landmarks
         method: "distance based"
         """
-        self.score += 1 # sub. increment score infinitly
+        self.score = random.random() # sub. increment score infinitly
         self.stage = "dancing"
         return self.score, self.stage

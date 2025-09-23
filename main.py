@@ -35,6 +35,13 @@ def main():
     
     icon_data = load_icons(ICON_PATH)
 
+    # Show a sticker every 2 s
+    last_sticker_time = 0   # timestamp of last sticker shown
+    sticker_start_time = 0
+    sticker_interval = 3.0    # every x seconds
+    sticker_duration = 1.5    # show sticker for x seconds
+    current_sticker_score = 1
+
     while True:  # allows relaunching
 
         # 1. Wait for person
@@ -60,7 +67,7 @@ def main():
                 display_frame = frame.copy()
 
                 # Draw a placeholder square
-                display_frame = visualizer.draw_end_message(display_frame, text=f"{judge.score}")
+                display_frame = visualizer.draw_end_message(display_frame, text=judge.score)
                 video.show(display_frame)
 
                 key = cv2.waitKey(1) & 0xFF
@@ -74,6 +81,10 @@ def main():
                     reference = VideoHandler(source=REF_VIDEO)
                     reference.set_rotation(90)
                     reference.set_target_size(width=FRAME_WIDTH, height=FRAME_HEIGHT)
+                    # Restart sticker
+                    last_sticker_time = 0   
+                    sticker_start_time = 0
+                    # Restart count
                     start_time = time.time()
                     break
                 continue
@@ -93,6 +104,19 @@ def main():
                 if icon_cfg["start"] <= elapsed <= icon_cfg["end"]:
                     ref_frame = visualizer.overlay_icon(ref_frame, icon_cfg["image"],
                                                        size=tuple(icon_cfg["size"]))
+           
+            # Check if it's time to show a new sticker
+            if elapsed - last_sticker_time >= sticker_interval:
+                show_sticker = True
+                last_sticker_time = elapsed  # reset last shown time
+                sticker_start_time = elapsed # when we started showing this sticker
+                current_sticker_score = judge.score
+            else:
+                show_sticker = False
+
+            # Keep showing sticker for sticker_duration
+            if current_sticker_score and (show_sticker or (elapsed - sticker_start_time <= sticker_duration)):
+                ref_frame = visualizer.overlay_score_sticker(ref_frame, current_sticker_score)
 
             video.show(ref_frame)
 
