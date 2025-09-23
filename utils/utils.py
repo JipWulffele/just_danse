@@ -1,6 +1,9 @@
 import time
 import cv2
 
+IMG_START_POSITION = cv2.imread("assets/images/start_position.png")
+
+
 def wait_for_person(video, detector, visualizer):
     """Keep showing webcam until a person with nose, hip, and feet is detected."""
     print("Waiting for person...")
@@ -21,8 +24,9 @@ def wait_for_person(video, detector, visualizer):
                 return True
 
             frame = detector.draw(frame, results)
-            frame = visualizer.draw_text(frame, "Stand in view...")
-
+        
+        frame = visualizer.draw_warning(frame, "Please position correctly", IMG_START_POSITION)
+            
         video.show(frame)
         if video.should_quit('q'):
             return False
@@ -30,13 +34,31 @@ def wait_for_person(video, detector, visualizer):
 
 
 def countdown(video, seconds=3):
-    """Show 3–2–1 countdown."""
-    for i in range(seconds, 0, -1):
+    """Run live video while showing a countdown overlay."""
+    start = time.time()
+    end = start + seconds
+
+    while time.time() < end:
         frame = video.get_frame()
         if frame is None:
             break
 
-        cv2.putText(frame, str(i), (frame.shape[1]//2 - 50, frame.shape[0]//2),
-                    cv2.FONT_HERSHEY_SIMPLEX, 5, (0, 255, 0), 8)
+        # Remaining whole seconds
+        remaining = int(end - time.time()) + 1  
+        
+        # Outline
+        cv2.putText(frame, str(remaining),
+                    (frame.shape[1]//2 - 50, frame.shape[0]//2),
+                    cv2.FONT_HERSHEY_SIMPLEX, 8,
+                  (255, 255, 255), 32, lineType=cv2.LINE_AA)
+        # Main text
+        cv2.putText(frame, str(remaining),
+                    (frame.shape[1]//2 - 50, frame.shape[0]//2),
+                    cv2.FONT_HERSHEY_SIMPLEX, 8,
+                    (84, 0, 255), 24, lineType=cv2.LINE_AA)
+
         video.show(frame)
-        cv2.waitKey(1000)  # wait 1s
+
+        # Run at normal video speed
+        if video.should_quit('q'):
+            break
