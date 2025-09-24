@@ -10,14 +10,15 @@ from core.pose_detector import PoseDetector
 from core.dance_judge import DanceJudge
 from core.visualizer import Visualizer
 from core.audio_player import AudioSyncPlayer
+from core.ecran import Ecran
 
 # Hyper parameters
 SOURCE = 0 # webcam index: check using ```ls /dev/video*```
 METHOD = "distance" # Method for calculating the score
-REF_VIDEO = "assets/video/reference.webm" # path to reference video
+REF_VIDEO = "assets/video/reference_unicorn.webm" # path to reference video
 REF_KEYPOINTS="assets/keypoints/keypoints_reference1.npz" # path to reference keypoints
 ICON_PATH = "assets/config/icon_schedule.json"
-AUDIO_PATH = "assets/audio/de_kabouter_dans_ultra_short_2.mp3"
+AUDIO_PATH = "assets/audio/de_kabouter_dans_short.mp3"
 FRAME_WIDTH = 1080
 FRAME_HEIGHT = 720
 WEBCAM_ROTATION = 90
@@ -26,12 +27,14 @@ FORCE_FPS = 0 # force frame rate during reference video -> 0 = play at normal sp
 
 def main():
 
+    ecran = Ecran() # Start screen
+
     video = VideoHandler(source=SOURCE)  # 0 for webcam, or path to video
     video.set_rotation(WEBCAM_ROTATION)
     video.set_target_size(width=FRAME_WIDTH, height=FRAME_HEIGHT)
     
     reference = VideoHandler(source=REF_VIDEO)
-    reference.set_rotation(90)
+    reference.set_rotation(-90)
     reference.set_target_size(width=FRAME_WIDTH, height=FRAME_HEIGHT)
 
     audio_player = AudioSyncPlayer(AUDIO_PATH)
@@ -52,6 +55,10 @@ def main():
     sticker_interval = 3.0   # every x seconds
     sticker_duration = 1.5   # show sticker for x seconds
     current_sticker_score = 1
+
+    # Show starting screen for 2 seconds
+    start_screen_frame = ecran.get_ecran_start(size=(FRAME_WIDTH , FRAME_HEIGHT))
+    ecran.show_ecran(video, reference, start_screen_frame, 2)
 
     while True:  # Main loop: allows relaunching
 
@@ -82,6 +89,7 @@ def main():
             elapsed = time.time() - start_time # total elapsed time
 
             expected_idx = int(elapsed / frame_duration)
+            print(expected_idx)
             
             if expected_idx > ref_frame_idx:
                 # Advance as many frames as needed
@@ -122,7 +130,7 @@ def main():
                         # Restart reference video
                         reference.release()
                         reference = VideoHandler(source=REF_VIDEO)
-                        reference.set_rotation(90)
+                        reference.set_rotation(-90)
                         reference.set_target_size(width=FRAME_WIDTH, height=FRAME_HEIGHT)
                         # Restart sticker
                         last_sticker_time = 0   
