@@ -116,6 +116,7 @@ def main():
                 last_sticker_time = elapsed  # reset last shown time
                 sticker_start_time = elapsed # when we started showing this sticker
                 current_sticker_score = judge.score
+                print(judge.score)
             else:
                 show_sticker = False
 
