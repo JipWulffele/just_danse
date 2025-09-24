@@ -164,13 +164,15 @@ class Visualizer:
         return frame
 
 
-    def score_to_text(self, score, min_score=0, max_score=1):
+    def score_to_text(self, score, min_score=-0.65, max_score=-0.3):
+        
+        score = -score  # invert: lower is better
         norm = (score - min_score) / (max_score - min_score)
     
         if norm < 0.2:
             return "Trop nul"
         elif norm < 0.4:
-            return "Moyen faible"
+            return "Faible"
         elif norm < 0.6:
             return "Moyen"
         elif norm < 0.8:
