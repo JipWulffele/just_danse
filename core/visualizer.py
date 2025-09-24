@@ -54,7 +54,7 @@ class Visualizer:
         font_scale = 2.5     # initial guess
 
         if text:
-            text = self.score_to_text(text, 0, 1)
+            text = self.score_to_text(text)
             score_text = f"Your Score: {text}"
             
             # Reduce font_scale until text fits
@@ -125,7 +125,7 @@ class Visualizer:
         """
 
         # Convert score to text
-        text = self.score_to_text(score, 0, 1)
+        text = self.score_to_text(score)
 
         # Parameters
         font = cv2.FONT_HERSHEY_SIMPLEX
@@ -164,18 +164,25 @@ class Visualizer:
         return frame
 
 
-    def score_to_text(self, score, min_score=-0.65, max_score=-0.3):
-        
-        score = -score  # invert: lower is better
-        norm = (score - min_score) / (max_score - min_score)
-    
-        if norm < 0.2:
+    def score_to_text(self, score, min_score=0.31, max_score=0.7):
+        """
+        Map a numeric score to a textual rating.
+        Lower scores are better: 0.3 → Excellent, 0.7 → Trop nul.
+        """
+        # Clip to range
+        score_clipped = np.clip(score, min_score, max_score)
+
+        # Invert normalization so lower is better
+        norm = (max_score - score_clipped) / (max_score - min_score)
+
+        # Map to text
+        if norm < 0.3:
             return "Trop nul"
-        elif norm < 0.4:
-            return "Faible"
         elif norm < 0.6:
+            return "Faible"
+        elif norm < 0.75:
             return "Moyen"
-        elif norm < 0.8:
+        elif norm < 0.9:
             return "Bon"
         else:
             return "Excellent"

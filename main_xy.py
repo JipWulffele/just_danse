@@ -7,7 +7,7 @@ from utils.utils import wait_for_person, countdown, load_icons
 
 from core.video_handler import VideoHandler
 from core.pose_detector import PoseDetector
-from core.dance_judge import DanceJudge
+from core.dance_judge_xy import DanceJudge
 from core.visualizer import Visualizer
 from core.audio_player import AudioSyncPlayer
 
