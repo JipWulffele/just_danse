@@ -1,6 +1,7 @@
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
+import time
 
 class Ecran():
     def __init__(self):
@@ -74,6 +75,17 @@ class Ecran():
                         thickness=3)
         
         return frame_start
+    
+    def show_ecran(self, video, reference, start_screen_frame, duration):
+        start_time = time.time()
+        while time.time() - start_time < duration:  # show for 2 seconds
+            video.show(start_screen_frame)
+            if video.should_quit('q'):
+                video.release()
+                reference.release()
+                return
+            cv2.waitKey(1) 
+        
         
 if __name__ == "__main__":
     ecran = Ecran()

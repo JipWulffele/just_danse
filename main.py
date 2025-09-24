@@ -10,6 +10,7 @@ from core.pose_detector import PoseDetector
 from core.dance_judge import DanceJudge
 from core.visualizer import Visualizer
 from core.audio_player import AudioSyncPlayer
+from core.ecran import Ecran
 
 # Hyper parameters
 SOURCE = 0 # webcam index: check using ```ls /dev/video*```
@@ -25,6 +26,8 @@ FORCE_FPS = 0 # force frame rate during reference video -> 0 = play at normal sp
 
 
 def main():
+
+    ecran = Ecran() # Start screen
 
     video = VideoHandler(source=SOURCE)  # 0 for webcam, or path to video
     video.set_rotation(WEBCAM_ROTATION)
@@ -52,6 +55,10 @@ def main():
     sticker_interval = 3.0   # every x seconds
     sticker_duration = 1.5   # show sticker for x seconds
     current_sticker_score = 1
+
+    # Show starting screen for 2 seconds
+    start_screen_frame = ecran.get_ecran_start(size=(FRAME_WIDTH , FRAME_HEIGHT))
+    ecran.show_ecran(video, reference, start_screen_frame, 2)
 
     while True:  # Main loop: allows relaunching
 
