@@ -10,7 +10,7 @@ from core.dance_judge import DanceJudge
 from core.visualizer import Visualizer
 
 # Hyper parameters
-SOURCE = 1 # webcam index: check using ```ls /dev/video*```
+SOURCE = 0 # webcam index: check using ```ls /dev/video*```
 METHOD = "distance" # Method for calculating the score
 REF_VIDEO = "assets/video/reference.webm" # path to reference video
 ICON_PATH = "assets/config/icon_schedule.json"
