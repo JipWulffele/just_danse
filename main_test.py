@@ -39,31 +39,27 @@ def main():
     
     icon_data = load_icons(ICON_PATH)
 
+    # 🔹 Storage for user keypoints
+    user_keypoints_seq = []
+
     while True:  # allows relaunching
 
-        # 1. Wait for person
         if not wait_for_person(video, detector, visualizer):
             video.release()
             return
 
-        # 2. Countdown
         countdown(video, 3)
-
-        # 3. Dance session
         start_time = time.time()
 
         while video.is_open():
-            ref_frame = reference.get_frame()  # reference video
-            frame = video.get_frame()          # webcam stream
+            ref_frame = reference.get_frame()
+            frame = video.get_frame()
 
             if frame is None:
-                break  # webcam disconnected
+                break
 
-            # Reference video ended
             if ref_frame is None:
                 display_frame = frame.copy()
-
-                # Draw a placeholder square
                 display_frame = visualizer.draw_end_message(display_frame, text=f"{judge.score}")
                 video.show(display_frame)
 
@@ -71,28 +67,34 @@ def main():
                 if key == ord('q'):
                     video.release()
                     reference.release()
+                    # 🔹 Save collected keypoints
+                    if len(user_keypoints_seq) > 0:
+                        np.savez("assets/keypoints/user_session.npz", keypoints=np.array(user_keypoints_seq))
+                        print("User keypoints saved to assets/keypoints/user_session.npz")
                     return
                 elif key == ord('d'):
-                    # Restart reference video
                     reference.release()
                     reference = VideoHandler(source=REF_VIDEO)
                     reference.set_rotation(90)
                     reference.set_target_size(width=FRAME_WIDTH, height=FRAME_HEIGHT)
+
                     judge = DanceJudge(ref_keypoints_seq, shifts=[0,5,10,14,16,18,20])
+                    
                     start_time = time.time()
                     break
                 continue
 
-            # Detection and judging
             results = detector.detect(frame)
             if results.pose_landmarks:
                 score, stage = judge.update(results.pose_landmarks.landmark, WEBCAM_ROTATION, method=METHOD)
                 frame = detector.draw(frame, results)
 
-            # PiP webcam
+                # 🔹 Collect keypoints
+                user_kp = np.array([[lm.x, lm.y, lm.z] for lm in results.pose_landmarks.landmark])
+                user_keypoints_seq.append(user_kp)
+
             ref_frame = visualizer.overlay_pip(ref_frame, frame, size=(300,200))
 
-            # Overlay icons
             elapsed = time.time() - start_time
             for icon_cfg in icon_data["icons"]:
                 if icon_cfg["start"] <= elapsed <= icon_cfg["end"]:
@@ -101,10 +103,13 @@ def main():
 
             video.show(ref_frame)
 
-            # Quit
             if video.should_quit('q'):
                 video.release()
                 reference.release()
+                # 🔹 Save collected keypoints
+                if len(user_keypoints_seq) > 0:
+                    np.savez("assets/keypoints/user_session.npz", keypoints=np.array(user_keypoints_seq))
+                    print("User keypoints saved to assets/keypoints/user_session.npz")
                 return
 
 if __name__ == "__main__":
