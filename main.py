@@ -9,6 +9,7 @@ from core.video_handler import VideoHandler
 from core.pose_detector import PoseDetector
 from core.dance_judge import DanceJudge
 from core.visualizer import Visualizer
+from core.audio_player import AudioSyncPlayer
 
 # Hyper parameters
 SOURCE = 0 # webcam index: check using ```ls /dev/video*```
@@ -16,6 +17,7 @@ METHOD = "distance" # Method for calculating the score
 REF_VIDEO = "assets/video/reference.webm" # path to reference video
 REF_KEYPOINTS="assets/keypoints/keypoints_reference1.npz" # path to reference keypoints
 ICON_PATH = "assets/config/icon_schedule.json"
+AUDIO_PATH = "assets/audio/de_kabouter_dans_ultra_short_2.mp3"
 FRAME_WIDTH = 1080
 FRAME_HEIGHT = 720
 WEBCAM_ROTATION = 90
@@ -31,6 +33,8 @@ def main():
     reference = VideoHandler(source=REF_VIDEO)
     reference.set_rotation(90)
     reference.set_target_size(width=FRAME_WIDTH, height=FRAME_HEIGHT)
+
+    audio_player = AudioSyncPlayer(AUDIO_PATH)
 
     detector = PoseDetector()
 
@@ -69,10 +73,11 @@ def main():
         last_ref_frame = None
         
         # 4. Dance session
+        audio_player.play()
         start_time = time.time()
 
         while video.is_open():
-            
+
             loop_start = time.time() # keep track of time
             elapsed = time.time() - start_time # total elapsed time
 
@@ -95,32 +100,39 @@ def main():
 
             # Reference video ended
             if ref_frame is None:
-                display_frame = frame.copy()
+                if ref_frame_idx == 0: # At the begining the index might be 0 for some frames
+                    display_frame = frame.copy() # Get frame from webcam as fallback
+                    video.show(display_frame)
+                    continue
 
-                # Draw a placeholder square
-                display_frame = visualizer.draw_end_message(display_frame, text=judge.score)
-                video.show(display_frame)
+                else: # only stop when reference video finished playing
+                    audio_player.stop()
+                    
+                    # Draw a placeholder square
+                    display_frame = frame.copy() # Get frame from webcam as fallback
+                    display_frame = visualizer.draw_end_message(display_frame, text=judge.score)
+                    video.show(display_frame)
 
-                key = cv2.waitKey(1) & 0xFF
-                if key == ord('q'):
-                    video.release()
-                    reference.release()
-                    return
-                elif key == ord('d'):
-                    # Restart reference video
-                    reference.release()
-                    reference = VideoHandler(source=REF_VIDEO)
-                    reference.set_rotation(90)
-                    reference.set_target_size(width=FRAME_WIDTH, height=FRAME_HEIGHT)
-                    # Restart sticker
-                    last_sticker_time = 0   
-                    sticker_start_time = 0
-                    # Restart count
-                    judge = DanceJudge(ref_keypoints_seq, shifts=[0,5,10,14,16,18,20])
-                    ref_frame_idx = 0
-                    start_time = time.time()
-                    break
-                continue
+                    key = cv2.waitKey(1) & 0xFF
+                    if key == ord('q'):
+                        video.release()
+                        reference.release()
+                        return
+                    elif key == ord('d'):
+                        # Restart reference video
+                        reference.release()
+                        reference = VideoHandler(source=REF_VIDEO)
+                        reference.set_rotation(90)
+                        reference.set_target_size(width=FRAME_WIDTH, height=FRAME_HEIGHT)
+                        # Restart sticker
+                        last_sticker_time = 0   
+                        sticker_start_time = 0
+                        # Restart count
+                        judge = DanceJudge(ref_keypoints_seq, shifts=[0,5,10,14,16,18,20])
+                        ref_frame_idx = 0
+                        start_time = time.time()
+                        break
+                    continue
 
             # Detection and judging
             results = detector.detect(frame)
@@ -144,7 +156,7 @@ def main():
                 last_sticker_time = elapsed  # reset last shown time
                 sticker_start_time = elapsed # when we started showing this sticker
                 current_sticker_score = judge.score
-                print(judge.score)
+                print(f"Raw score (for debugging): {judge.score}")
             else:
                 show_sticker = False
 
