@@ -176,13 +176,13 @@ class Visualizer:
         norm = (max_score - score_clipped) / (max_score - min_score)
 
         # Map to text
-        if norm < 0.2:
+        if norm < 0.3:
             return "Trop nul"
-        elif norm < 0.4:
-            return "Faible"
         elif norm < 0.6:
+            return "Faible"
+        elif norm < 0.75:
             return "Moyen"
-        elif norm < 0.8:
+        elif norm < 0.9:
             return "Bon"
         else:
             return "Excellent"
