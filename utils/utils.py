@@ -2,6 +2,7 @@ import time
 import cv2
 import json
 import os
+import pygame
 
 IMG_START_POSITION = cv2.imread("assets/images/icon_start.png")
 
@@ -54,22 +55,40 @@ def wait_for_person(video, detector, visualizer):
 
 def countdown(video, seconds=3):
     """Run live video while showing a countdown overlay."""
+
+    # Init audio
+    pygame.mixer.init(buffer=256)
+    beep = pygame.mixer.Sound("assets/audio/beep-01a.wav")
+
+    # Warm up mixer
+    beep.set_volume(0.0)
+    beep.play()
+    pygame.time.delay(50)
+    beep.stop()
+    beep.set_volume(1.0)
+    pygame.time.delay(100)  # let mixer settle
+
     start = time.time()
     end = start + seconds
+    last_remaining = seconds + 1  # ensures first beep is inside loop
 
     while time.time() < end:
         frame = video.get_frame()
         if frame is None:
             break
 
-        # Remaining whole seconds
         remaining = int(end - time.time()) + 1  
-        
-        # Outline
+
+        # Beep once per number
+        if remaining != last_remaining:
+            beep.play(maxtime=200)
+            last_remaining = remaining
+
+        # Outline text
         cv2.putText(frame, str(remaining),
                     (frame.shape[1]//2 - 50, frame.shape[0]//2),
                     cv2.FONT_HERSHEY_SIMPLEX, 8,
-                  (255, 255, 255), 32, lineType=cv2.LINE_AA)
+                    (255, 255, 255), 32, lineType=cv2.LINE_AA)
         # Main text
         cv2.putText(frame, str(remaining),
                     (frame.shape[1]//2 - 50, frame.shape[0]//2),
@@ -78,6 +97,5 @@ def countdown(video, seconds=3):
 
         video.show(frame)
 
-        # Run at normal video speed
         if video.should_quit('q'):
             break
