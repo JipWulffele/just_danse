@@ -17,7 +17,7 @@ METHOD = "distance" # Method for calculating the score
 REF_VIDEO = "assets/video/reference.webm" # path to reference video
 REF_KEYPOINTS="assets/keypoints/keypoints_reference1.npz" # path to reference keypoints
 ICON_PATH = "assets/config/icon_schedule.json"
-AUDIO_PATH = "assets/audio/de_kabouter_dans_short.mp3"
+AUDIO_PATH = "assets/audio/de_kabouter_dans_ultra_short_2.mp3"
 FRAME_WIDTH = 1080
 FRAME_HEIGHT = 720
 WEBCAM_ROTATION = 90
@@ -100,8 +100,7 @@ def main():
 
             # Reference video ended
             if ref_frame is None:
-                print(elapsed)
-                if ref_frame_idx == 0: # At the begiiining the index might be 0 for some frames
+                if ref_frame_idx == 0: # At the begining the index might be 0 for some frames
                     display_frame = frame.copy() # Get frame from webcam as fallback
                     video.show(display_frame)
                     continue
@@ -157,7 +156,7 @@ def main():
                 last_sticker_time = elapsed  # reset last shown time
                 sticker_start_time = elapsed # when we started showing this sticker
                 current_sticker_score = judge.score
-                print(judge.score)
+                print(f"Raw score (for debugging): {judge.score}")
             else:
                 show_sticker = False
 
