@@ -87,6 +87,12 @@ class DanceJudge:
         user_kp = self.normalize_keypoints(user_kp)
         user_kp = self.rotate_keypoints(user_kp, angle)
 
+        # Indices to exclude
+        exclude_idx = list(range(1, 11)) + [19, 20, 21, 22, 29, 30]
+
+        # Create a mask to keep only valid points
+        mask = np.array([i for i in range(user_kp.shape[0]) if i not in exclude_idx])
+
         # Update distances for each shift
         for shift in self.shifts:
             if self.frame_idx - shift < 0:
@@ -95,8 +101,13 @@ class DanceJudge:
                 continue
 
             ref_kp = self.ref_keypoints_seq[self.frame_idx - shift]
+
             if ref_kp is not None and not np.isnan(ref_kp).any():
-                dist = np.nanmean(np.linalg.norm(user_kp - ref_kp, axis=1))
+                # Filter both user and reference by the mask
+                user_sel = user_kp[mask]
+                ref_sel = ref_kp[mask]
+
+                dist = np.nanmean(np.linalg.norm(user_sel - ref_sel, axis=1))
                 self.sums[shift] += dist
                 self.counts[shift] += 1
 

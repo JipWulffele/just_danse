@@ -49,7 +49,7 @@ class Visualizer:
         cv2.rectangle(frame, (40, 40), (w-40, h-40), (0, 189, 255), 10)
 
         if text:
-            text = self.score_to_text(text, 0, 1)
+            text = self.score_to_text(text)
             score_text = f"Your Score: {text}"
 
             font = cv2.FONT_HERSHEY_SIMPLEX
@@ -125,7 +125,7 @@ class Visualizer:
         """
 
         # Convert score to text
-        text = self.score_to_text(score, 0, 1)
+        text = self.score_to_text(score)
 
         # Parameters
         font = cv2.FONT_HERSHEY_SIMPLEX
@@ -164,11 +164,18 @@ class Visualizer:
         return frame
 
 
-    def score_to_text(self, score, min_score=-0.65, max_score=-0.3):
-        
-        score = -score  # invert: lower is better
-        norm = (score - min_score) / (max_score - min_score)
-    
+    def score_to_text(self, score, min_score=0.31, max_score=0.7):
+        """
+        Map a numeric score to a textual rating.
+        Lower scores are better: 0.3 → Excellent, 0.7 → Trop nul.
+        """
+        # Clip to range
+        score_clipped = np.clip(score, min_score, max_score)
+
+        # Invert normalization so lower is better
+        norm = (max_score - score_clipped) / (max_score - min_score)
+
+        # Map to text
         if norm < 0.2:
             return "Trop nul"
         elif norm < 0.4:
