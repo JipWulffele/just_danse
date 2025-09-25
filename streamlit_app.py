@@ -2,6 +2,7 @@ import streamlit as st
 import cv2
 from core.dance_session import DanceSession
 from utils.utils_streamlit import load_icons
+from core.ecran import Ecran
 
 # ---------- Dances config
 DANCES = {
@@ -38,6 +39,8 @@ STICKER = {"last_sticker_duration": 0,
 ICON_PATH = "assets/config/icon_schedule.json"
 icon_data = load_icons(ICON_PATH)
 
+SOURCE = 1
+
 # Initialize state variables
 if "dance_running" not in st.session_state:
     st.session_state.dance_running = False
@@ -50,8 +53,12 @@ difficulty = st.sidebar.selectbox("Difficulty:", ["Easy", "Medium", "Hard"])
 start_button = st.sidebar.button("Start Dance")
 
 # ---------- Main panel
-st.title("💃 Lets dance 🕺")
 FRAME_WINDOW = st.image([])
+
+# ecran de depart
+ecran = Ecran() # Start screen
+start_screen_frame = ecran.get_ecran_start(size=(1080, 720))
+FRAME_WINDOW.image(cv2.cvtColor(start_screen_frame , cv2.COLOR_BGR2RGB))
 
 if start_button:
     st.session_state.dance_running = True
@@ -59,6 +66,7 @@ if start_button:
 if st.session_state.dance_running:
     dance_session = DanceSession(DANCES[dance_choice],
                                   STICKER, icon_data=icon_data,
+                                  source=SOURCE,
                                   frame_window=FRAME_WINDOW, difficulty_levels=difficulty)
 
     detected, frame = dance_session.wait_for_person_and_countdown()
