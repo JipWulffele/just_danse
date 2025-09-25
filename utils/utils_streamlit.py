@@ -96,6 +96,6 @@ def countdown(video, seconds=3, frame_window=None):
         if frame_window is not None:
             frame_window.image(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
 
-        time.sleep(0.1)  # small delay to avoid overload
+        time.sleep(0.02)  # small delay to avoid overload
 
     return frame
