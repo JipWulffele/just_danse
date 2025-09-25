@@ -12,6 +12,8 @@ from core.ecran import Ecran
 from core.dance_judge import DanceJudge
 from core.audio_player import AudioSyncPlayer
 
+from src.features_extraction import FeaturesExtraction
+
 class DanceSession:
     def __init__(self, dance_config, sticker_config, icon_data=None, source=0, frame_window=None):
         self.dance_config = dance_config
@@ -29,6 +31,7 @@ class DanceSession:
         
         self.visualizer = Visualizer()
         self.ecran = Ecran()
+        self.chut_detector = FeaturesExtraction()
         
         self.frame_window = frame_window
 
@@ -112,6 +115,15 @@ class DanceSession:
 
             #ref_frame = self.ref_video.get_frame()
             cam_frame = self.video.get_frame()
+            # Check for chut
+            self.chut_detector.compute_feature_from_frame(cv2.cvtColor(cam_frame, cv2.COLOR_BGR2RGB))
+            fall_state, _, _, _, _, _ = self.chut_detector.frame_to_state()
+            if fall_state == True:
+                cam_frame = np.full((720, 1080, 3), 255, dtype=np.uint8)
+                cam_frame  = self.visualizer.draw_text(cam_frame, "Fall detected")
+                self.frame_window.image(cv2.cvtColor(cam_frame, cv2.COLOR_BGR2RGB))
+                break
+
 
             if ref_frame is None or cam_frame is None:
                 break
@@ -154,10 +166,11 @@ class DanceSession:
         self.ref_video.release()
 
         # Display final score overlay
-        cam_frame = np.full((720, 1080, 3), 255, dtype=np.uint8)
-        final_frame = self.visualizer.draw_end_message(cam_frame, text=self.judge.score, restart_message=False)
+        if fall_state == False:
+            cam_frame = np.full((720, 1080, 3), 255, dtype=np.uint8)
+            final_frame = self.visualizer.draw_end_message(cam_frame, text=self.judge.score, restart_message=False)
 
-        self.frame_window.image(cv2.cvtColor(final_frame, cv2.COLOR_BGR2RGB))
+            self.frame_window.image(cv2.cvtColor(final_frame, cv2.COLOR_BGR2RGB))
 
     
     def run_frame(self):
@@ -169,4 +182,5 @@ class DanceSession:
 
     def release(self):
         self.audio_player.stop()
+        self.ref_video.release()
         self.video.release()

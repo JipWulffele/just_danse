@@ -11,7 +11,6 @@ DANCES = {
         "audio": "assets/audio/de_kabouter_dans_short.mp3",
         "icon_path": "assets/config/icon_schedule.json",
         "webcam_rotation": -90,
-        "ref_video_rotation": -90,
     },
     "Old Dance": {
         "ref_video": "assets/video/reference.webm",
@@ -19,7 +18,6 @@ DANCES = {
         "audio": "assets/audio/de_kabouter_dans_ultra_short_2.mp3",
         "icon_path": "assets/config/icon_schedule_old.json",
         "webcam_rotation": 90,
-        "ref_video_rotation": -90,
     },
 }
 
@@ -42,7 +40,7 @@ st.sidebar.title("Lets dance!")
 dance_choice = st.sidebar.selectbox("Choose your dance:", list(DANCES.keys()))
 difficulty = st.sidebar.selectbox("Difficulty:", ["Easy", "Medium", "Hard"])
 
-start_button = st.sidebar.button("Start Dance", disabled=st.session_state.dance_running)
+start_button = st.sidebar.button("Start Dance")
 
 # ---------- Main panel
 st.title("💃 Lets dance 🕺")
