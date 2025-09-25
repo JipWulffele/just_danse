@@ -15,57 +15,71 @@ from core.ecran import Ecran
 # Hyper parameters
 SOURCE = 0 # webcam index: check using ```ls /dev/video*```
 METHOD = "distance" # Method for calculating the score
-REF_VIDEO = "assets/video/reference_unicorn.webm" # path to reference video
-REF_KEYPOINTS="assets/keypoints/keypoints_reference_unicorn.npz" # path to reference keypoints
-ICON_PATH = "assets/config/icon_schedule.json"
-AUDIO_PATH = "assets/audio/de_kabouter_dans_short.mp3"
 FRAME_WIDTH = 1080
 FRAME_HEIGHT = 720
-WEBCAM_ROTATION = -90
 FORCE_FPS = 0 # force frame rate during reference video -> 0 = play at normal speed (25 fps)
 # 🔹 New flag
-SAVE_KEYPOINTS = True   # set False if you don't want to save
+SAVE_KEYPOINTS = False   # set False if you don't want to save
 
 def main():
 
     ecran = Ecran() # Start screen
 
-    video = VideoHandler(source=SOURCE)  # 0 for webcam, or path to video
-    video.set_rotation(WEBCAM_ROTATION)
-    video.set_target_size(width=FRAME_WIDTH, height=FRAME_HEIGHT)
-    
-    reference = VideoHandler(source=REF_VIDEO)
-    reference.set_rotation(WEBCAM_ROTATION)
-    reference.set_target_size(width=FRAME_WIDTH, height=FRAME_HEIGHT)
 
-    audio_player = AudioSyncPlayer(AUDIO_PATH)
-
-    detector = PoseDetector()
-
-    data = np.load(REF_KEYPOINTS)
-    ref_keypoints_seq = data["keypoints"]
-    judge = DanceJudge(ref_keypoints_seq, shifts=[0,5,10,14,16,18,20], angle_deg=WEBCAM_ROTATION)
-    
-    visualizer = Visualizer()
-    
-    icon_data = load_icons(ICON_PATH)
-
-    if SAVE_KEYPOINTS:
-        # 🔹 Storage for user keypoints
-        user_keypoints_seq = []
-
-    # Show a sticker every 2 s
-    last_sticker_time = 0    # timestamp of last sticker shown
-    sticker_start_time = 0
-    sticker_interval = 3.0   # every x seconds
-    sticker_duration = 1.5   # show sticker for x seconds
-    current_sticker_score = 0
-
-    # Show starting screen for 2 seconds
-    start_screen_frame = ecran.get_ecran_start(size=(FRAME_WIDTH , FRAME_HEIGHT))
-    ecran.show_ecran(video, reference, start_screen_frame, 2)
 
     while True:  # Main loop: allows relaunching
+
+        try:
+            video.release()
+        except NameError:
+            pass
+
+            # Choose song with OpenCV menu
+        song = ecran.choose_song()
+        if song is None:
+            print("No song selected. Exiting...")
+            return
+
+        REF_VIDEO = song["video"]
+        REF_KEYPOINTS = song["keypoints"]
+        AUDIO_PATH = song["audio"]
+        WEBCAM_ROTATION = song["angle"]
+        ICON_PATH = song["icon"]
+
+        video = VideoHandler(source=SOURCE)  # 0 for webcam, or path to video
+        video.set_rotation(WEBCAM_ROTATION)
+        video.set_target_size(width=FRAME_WIDTH, height=FRAME_HEIGHT)
+        
+        reference = VideoHandler(source=REF_VIDEO)
+        reference.set_rotation(WEBCAM_ROTATION)
+        reference.set_target_size(width=FRAME_WIDTH, height=FRAME_HEIGHT)
+
+        audio_player = AudioSyncPlayer(AUDIO_PATH)
+
+        detector = PoseDetector()
+
+        data = np.load(REF_KEYPOINTS)
+        ref_keypoints_seq = data["keypoints"]
+        judge = DanceJudge(ref_keypoints_seq, shifts=[0,5,10,14,16,18,20], angle_deg=WEBCAM_ROTATION)
+        
+        visualizer = Visualizer()
+        
+        icon_data = load_icons(ICON_PATH)
+
+        if SAVE_KEYPOINTS:
+            # 🔹 Storage for user keypoints
+            user_keypoints_seq = []
+
+        # Show a sticker every 2 s
+        last_sticker_time = 0    # timestamp of last sticker shown
+        sticker_start_time = 0
+        sticker_interval = 3.0   # every x seconds
+        sticker_duration = 1.5   # show sticker for x seconds
+        current_sticker_score = 0
+
+        # Show starting screen for 2 seconds
+        start_screen_frame = ecran.get_ecran_start(size=(FRAME_WIDTH , FRAME_HEIGHT))
+        ecran.show_ecran(video, reference, start_screen_frame, 2)
 
         # 1. Wait for person
         if not wait_for_person(video, detector, visualizer):

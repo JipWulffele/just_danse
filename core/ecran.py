@@ -2,6 +2,7 @@ import numpy as np
 import cv2
 import matplotlib.pyplot as plt
 import time
+import json
 
 class Ecran():
     def __init__(self):
@@ -85,7 +86,57 @@ class Ecran():
                 reference.release()
                 return
             cv2.waitKey(1) 
-        
+
+    def choose_song(self, config_path="assets/config/songs.json", size=(1080, 720)):
+        with open(config_path, "r") as f:
+            data = json.load(f)
+
+        songs = data["songs"]
+
+        # Menu loop
+        selected = 0  # Index of the currently highlighted song
+        while True:
+            # Background
+            frame = 255 * np.ones((size[1], size[0], 3), dtype=np.uint8)
+
+            # Title
+            cv2.putText(frame, "🎵 Choose Your Song 🎵",
+                        (100, 100), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 0), 5)
+
+            # List songs with highlight
+            for idx, song in enumerate(songs):
+                y = 200 + idx * 80
+                if idx == selected:
+                    # Draw a highlight rectangle behind the selected song
+                    cv2.rectangle(frame,
+                                (120, y - 40),
+                                (900, y + 10),
+                                (200, 200, 255),  # light purple
+                                -1)
+                    color = (0, 0, 255)  # red text for selected
+                else:
+                    color = (0, 0, 0)    # black text for others
+
+                cv2.putText(frame, f"{idx+1}. {song['name']}",
+                            (150, y),
+                            cv2.FONT_HERSHEY_SIMPLEX, 1.5, color, 4)
+
+            cv2.imshow("Menu", frame)
+
+            # Handle key input
+            key = cv2.waitKey(100)
+            if key == 82:       # Up arrow
+                selected = (selected - 1) % len(songs)
+            elif key == 84:     # Down arrow
+                selected = (selected + 1) % len(songs)
+            elif key == 13:           # Enter key
+                cv2.destroyWindow("Menu")
+                return songs[selected]
+            elif key == ord('q'):     # Quit
+                cv2.destroyWindow("Menu")
+                return None
+
+            
         
 if __name__ == "__main__":
     ecran = Ecran()

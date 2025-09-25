@@ -1,0 +1,20 @@
+{
+    "songs": [
+      {
+        "name": "Unicorn Dance",
+        "video": "assets/video/reference_unicorn.webm",
+        "keypoints": "assets/keypoints/keypoints_reference_unicorn.npz",
+        "audio": "assets/audio/de_kabouter_dans_short.mp3",
+        "angle": -90,
+        "icon": "assets/config/icon_schedule.json"
+      },
+      {
+        "name": "Dance",
+        "video": "assets/video/reference.webm",
+        "keypoints": "assets/keypoints/keypoints_reference1.npz",
+        "audio": "assets/audio/de_kabouter_dans_ultra_short_2.mp3",
+        "angle": 90,
+        "icon":"assets/config/icon_schedule.json"
+      }
+    ]
+  }
