@@ -107,6 +107,8 @@ def main():
             else:
                 ref_frame = last_ref_frame
 
+            print(expected_idx, ref_frame_idx)
+
             frame = video.get_frame()
             if frame is None:
                 break
