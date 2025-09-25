@@ -19,7 +19,7 @@ class DanceSession:
         self.icon_data = icon_data
         
         self.video = VideoHandler(source)
-        self.video.set_rotation(-90)
+        self.video.set_rotation(dance_config["webcam_rotation"])
         
         self.detector = PoseDetector()
 
@@ -33,10 +33,10 @@ class DanceSession:
         self.frame_window = frame_window
 
         self.ref_video = VideoHandler(dance_config["ref_video"])
-        self.ref_video.set_rotation(-90)
+        self.ref_video.set_rotation(dance_config["webcam_rotation"])
         self.ref_video.set_target_size(width=1080, height=720)
         self.audio_player = AudioSyncPlayer(dance_config["audio"])
-        self.fps = 30 # very important!!! should match ref video or music will be out of sync
+        self.fps = self.ref_video.cap.get(cv2.CAP_PROP_FPS) # very important!!! should match ref video or music will be out of sync
         self.frame_duration = 1.0 / self.fps
 
 
@@ -153,6 +153,13 @@ class DanceSession:
         self.audio_player.stop()
         self.ref_video.release()
 
+        # Display final score overlay
+        cam_frame = np.full((720, 1080, 3), 255, dtype=np.uint8)
+        final_frame = self.visualizer.draw_end_message(cam_frame, text=self.judge.score, restart_message=False)
+
+        self.frame_window.image(cv2.cvtColor(final_frame, cv2.COLOR_BGR2RGB))
+
+    
     def run_frame(self):
         frame = self.video.get_frame()
         return frame

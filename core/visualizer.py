@@ -36,7 +36,7 @@ class Visualizer:
 
         return frame
     
-    def draw_end_message(self, frame, text=None):
+    def draw_end_message(self, frame, text=None, restart_message=True):
         h, w, _ = frame.shape
 
         # --- Semi-transparent overlay ---
@@ -69,14 +69,15 @@ class Visualizer:
             cv2.putText(frame, score_text, (100, 150), font, font_scale, (153, 0, 57), thickness, cv2.LINE_AA)
 
         # Festive message below
-        message = "Press 'q' to quit | Press 'd' to dance again"
-        msg_font_scale = 1.2
-        (msg_w, msg_h), _ = cv2.getTextSize(message, font, msg_font_scale, 3)
-        # Optionally shrink message if too wide
-        while msg_w > w - 200 and msg_font_scale > 0.5:
-            msg_font_scale -= 0.1
+        if restart_message:
+            message = "Press 'q' to quit | Press 'd' to dance again"
+            msg_font_scale = 1.2
             (msg_w, msg_h), _ = cv2.getTextSize(message, font, msg_font_scale, 3)
-        cv2.putText(frame, message, (100, h - 100), font, msg_font_scale, (255, 255, 255), 3, cv2.LINE_AA)
+            # Optionally shrink message if too wide
+            while msg_w > w - 200 and msg_font_scale > 0.5:
+                msg_font_scale -= 0.1
+                (msg_w, msg_h), _ = cv2.getTextSize(message, font, msg_font_scale, 3)
+            cv2.putText(frame, message, (100, h - 100), font, msg_font_scale, (255, 255, 255), 3, cv2.LINE_AA)
 
         return frame
     
