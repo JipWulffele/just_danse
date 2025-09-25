@@ -16,12 +16,12 @@ from core.ecran import Ecran
 SOURCE = 0 # webcam index: check using ```ls /dev/video*```
 METHOD = "distance" # Method for calculating the score
 REF_VIDEO = "assets/video/reference_unicorn.webm" # path to reference video
-REF_KEYPOINTS="assets/keypoints/keypoints_reference1.npz" # path to reference keypoints
+REF_KEYPOINTS="assets/keypoints/keypoints_reference_unicorn.npz" # path to reference keypoints
 ICON_PATH = "assets/config/icon_schedule.json"
 AUDIO_PATH = "assets/audio/de_kabouter_dans_short.mp3"
 FRAME_WIDTH = 1080
 FRAME_HEIGHT = 720
-WEBCAM_ROTATION = 90
+WEBCAM_ROTATION = -90
 FORCE_FPS = 0 # force frame rate during reference video -> 0 = play at normal speed (25 fps)
 
 
@@ -54,7 +54,7 @@ def main():
     sticker_start_time = 0
     sticker_interval = 3.0   # every x seconds
     sticker_duration = 1.5   # show sticker for x seconds
-    current_sticker_score = 1
+    current_sticker_score = 0
 
     # Show starting screen for 2 seconds
     start_screen_frame = ecran.get_ecran_start(size=(FRAME_WIDTH , FRAME_HEIGHT))
@@ -89,7 +89,7 @@ def main():
             elapsed = time.time() - start_time # total elapsed time
 
             expected_idx = int(elapsed / frame_duration)
-            print(expected_idx)
+            #print(expected_idx)
             
             if expected_idx > ref_frame_idx:
                 # Advance as many frames as needed
@@ -136,7 +136,7 @@ def main():
                         last_sticker_time = 0   
                         sticker_start_time = 0
                         # Restart count
-                        judge = DanceJudge(ref_keypoints_seq, shifts=[0,5,10,14,16,18,20])
+                        judge = DanceJudge(ref_keypoints_seq, shifts=[0,5,10,14,16,18,20], angle_deg=WEBCAM_ROTATION)
                         ref_frame_idx = 0
                         start_time = time.time()
                         break

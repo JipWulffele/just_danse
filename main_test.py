@@ -13,8 +13,8 @@ from core.visualizer import Visualizer
 # Hyper parameters
 SOURCE = 0 # webcam index: check using ```ls /dev/video*```
 METHOD = "distance" # Method for calculating the score
-REF_VIDEO = "assets/video/reference.webm" # path to reference video
-REF_KEYPOINTS="assets/keypoints/keypoints_reference1.npz" # path to reference keypoints
+REF_VIDEO = "assets/video/reference_unicorn.webm" # path to reference video
+REF_KEYPOINTS="assets/keypoints/keypoints_reference_unicorn.npz" # path to reference keypoints
 ICON_PATH = "assets/config/icon_schedule.json"
 FRAME_WIDTH = 1080
 FRAME_HEIGHT = 720
