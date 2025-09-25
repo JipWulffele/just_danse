@@ -178,7 +178,6 @@ class Visualizer:
         Map a numeric score to a textual rating.
         Lower scores are better: 0.3 → Excellent, 0.7 → Trop nul.
         """
-        print(f"difficulty penalty: {self.difficulty_penalty}")
         
         # Clip to range
         score_clipped = np.clip(score, min_score, max_score)
