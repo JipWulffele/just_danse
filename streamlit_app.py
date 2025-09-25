@@ -19,6 +19,13 @@ DANCES = {
         "icon_path": "assets/config/icon_schedule_old.json",
         "webcam_rotation": 90,
     },
+    "Dabca": {
+        "ref_video": "assets/video/dabca.webm",
+        "ref_keypoints": "assets/keypoints/keypoints_reference1.npz",
+        "audio": "assets/audio/dabca_music.mp3",
+        "icon_path": "assets/config/icon_schedule_old.json",
+        "webcam_rotation": -90,
+    },
 }
 
 STICKER = {"last_sticker_duration": 0,
