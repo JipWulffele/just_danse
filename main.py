@@ -10,28 +10,32 @@ from core.pose_detector import PoseDetector
 from core.dance_judge import DanceJudge
 from core.visualizer import Visualizer
 from core.audio_player import AudioSyncPlayer
+from core.ecran import Ecran
 
 # Hyper parameters
 SOURCE = 0 # webcam index: check using ```ls /dev/video*```
 METHOD = "distance" # Method for calculating the score
-REF_VIDEO = "assets/video/reference.webm" # path to reference video
-REF_KEYPOINTS="assets/keypoints/keypoints_reference1.npz" # path to reference keypoints
+REF_VIDEO = "assets/video/reference_unicorn.webm" # path to reference video
+REF_KEYPOINTS="assets/keypoints/keypoints_reference_unicorn.npz" # path to reference keypoints
 ICON_PATH = "assets/config/icon_schedule.json"
-AUDIO_PATH = "assets/audio/de_kabouter_dans_ultra_short_2.mp3"
+AUDIO_PATH = "assets/audio/de_kabouter_dans_short.mp3"
 FRAME_WIDTH = 1080
 FRAME_HEIGHT = 720
-WEBCAM_ROTATION = 90
+WEBCAM_ROTATION = -90
 FORCE_FPS = 0 # force frame rate during reference video -> 0 = play at normal speed (25 fps)
-
+# 🔹 New flag
+SAVE_KEYPOINTS = True   # set False if you don't want to save
 
 def main():
+
+    ecran = Ecran() # Start screen
 
     video = VideoHandler(source=SOURCE)  # 0 for webcam, or path to video
     video.set_rotation(WEBCAM_ROTATION)
     video.set_target_size(width=FRAME_WIDTH, height=FRAME_HEIGHT)
     
     reference = VideoHandler(source=REF_VIDEO)
-    reference.set_rotation(90)
+    reference.set_rotation(WEBCAM_ROTATION)
     reference.set_target_size(width=FRAME_WIDTH, height=FRAME_HEIGHT)
 
     audio_player = AudioSyncPlayer(AUDIO_PATH)
@@ -46,12 +50,20 @@ def main():
     
     icon_data = load_icons(ICON_PATH)
 
+    if SAVE_KEYPOINTS:
+        # 🔹 Storage for user keypoints
+        user_keypoints_seq = []
+
     # Show a sticker every 2 s
     last_sticker_time = 0    # timestamp of last sticker shown
     sticker_start_time = 0
     sticker_interval = 3.0   # every x seconds
     sticker_duration = 1.5   # show sticker for x seconds
-    current_sticker_score = 1
+    current_sticker_score = 0
+
+    # Show starting screen for 2 seconds
+    start_screen_frame = ecran.get_ecran_start(size=(FRAME_WIDTH , FRAME_HEIGHT))
+    ecran.show_ecran(video, reference, start_screen_frame, 2)
 
     while True:  # Main loop: allows relaunching
 
@@ -82,6 +94,7 @@ def main():
             elapsed = time.time() - start_time # total elapsed time
 
             expected_idx = int(elapsed / frame_duration)
+            #print(expected_idx)
             
             if expected_idx > ref_frame_idx:
                 # Advance as many frames as needed
@@ -93,6 +106,8 @@ def main():
                 last_ref_frame = ref_frame
             else:
                 ref_frame = last_ref_frame
+
+            print(expected_idx, ref_frame_idx)
 
             frame = video.get_frame()
             if frame is None:
@@ -117,18 +132,22 @@ def main():
                     if key == ord('q'):
                         video.release()
                         reference.release()
+                        # 🔹 Save user keypoints if enabled
+                        if SAVE_KEYPOINTS and len(user_keypoints_seq) > 0:
+                            np.savez("assets/keypoints/user_session.npz", keypoints=np.array(user_keypoints_seq))
+                            print("User keypoints saved to assets/keypoints/user_session.npz")
                         return
                     elif key == ord('d'):
                         # Restart reference video
                         reference.release()
                         reference = VideoHandler(source=REF_VIDEO)
-                        reference.set_rotation(90)
+                        reference.set_rotation(WEBCAM_ROTATION)
                         reference.set_target_size(width=FRAME_WIDTH, height=FRAME_HEIGHT)
                         # Restart sticker
                         last_sticker_time = 0   
                         sticker_start_time = 0
                         # Restart count
-                        judge = DanceJudge(ref_keypoints_seq, shifts=[0,5,10,14,16,18,20])
+                        judge = DanceJudge(ref_keypoints_seq, shifts=[0,5,10,14,16,18,20], angle_deg=WEBCAM_ROTATION)
                         ref_frame_idx = 0
                         start_time = time.time()
                         break
@@ -139,6 +158,10 @@ def main():
             if results.pose_landmarks:
                 score, stage = judge.update(results.pose_landmarks.landmark, expected_idx=expected_idx, method=METHOD) # prend expected_idx
                 frame = detector.draw(frame, results)
+                # 🔹 Collect keypoints if enabled
+                if SAVE_KEYPOINTS:
+                    user_kp = np.array([[lm.x, lm.y, lm.z] for lm in results.pose_landmarks.landmark])
+                    user_keypoints_seq.append(user_kp)
 
             # PiP webcam
             ref_frame = visualizer.overlay_pip(ref_frame, frame, size=(300,200))
@@ -175,6 +198,10 @@ def main():
             if video.should_quit('q'):
                 video.release()
                 reference.release()
+                # 🔹 Save user keypoints if enabled
+                if SAVE_KEYPOINTS and len(user_keypoints_seq) > 0:
+                    np.savez("assets/keypoints/user_session_unicorn.npz", keypoints=np.array(user_keypoints_seq))
+                    print("User keypoints saved to assets/keypoints/user_session_unicorn.npz")
                 return
 
 if __name__ == "__main__":

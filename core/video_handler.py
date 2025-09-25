@@ -4,8 +4,8 @@ class VideoHandler:
     def __init__(self, source=0):
         self.cap = cv2.VideoCapture(source)
         self.rotation_angle = 0  # default no rotation
-        self.target_width = None
-        self.target_height = None
+        self.target_width = 1080
+        self.target_height = 720
 
     def is_open(self):
         return self.cap.isOpened()

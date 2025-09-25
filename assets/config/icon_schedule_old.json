@@ -3,31 +3,31 @@
     {
       "file": "./images/icon_turn.png",
       "start_frame": 0,
-      "end_frame": 120,
+      "end_frame": 40,
       "size": [200, 200]
     },
     {
       "file": "./images/icon_stamp.png",
-      "start_frame": 120,
-      "end_frame": 180,
+      "start_frame": 40,
+      "end_frame": 90,
       "size": [200, 200]
     },
     {
       "file": "./images/icon_wave.png",
-      "start_frame": 180,
-      "end_frame": 250,
+      "start_frame": 90,
+      "end_frame": 140,
       "size": [200, 200]
     },
     {
       "file": "./images/icon_squat.png",
-      "start_frame": 250,
-      "end_frame": 320,
+      "start_frame": 140,
+      "end_frame": 200,
       "size": [200, 200]
     },
     {
       "file": "./images/icon_squat_turn.png",
-      "start_frame": 320,
-      "end_frame": 480,
+      "start_frame": 200,
+      "end_frame": 350,
       "size": [200, 200]
     }
   ]

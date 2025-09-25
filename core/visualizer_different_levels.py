@@ -2,6 +2,14 @@ import cv2
 import numpy as np
 
 class Visualizer:
+    def __init__(self, difficulty_levels='Medium'):
+        self.difficulty_levels = difficulty_levels
+        self.difficulty_penalty = {
+            'Easy': -0.1,
+            'Medium': 0.0,
+            'Hard': 0.1
+        }.get(self.difficulty_levels, 0.0)
+
     def draw_count(self, frame, count):
         cv2.putText(frame, f"Score: {count}", (30, 50),
                     cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 0), 2)
@@ -170,6 +178,8 @@ class Visualizer:
         Map a numeric score to a textual rating.
         Lower scores are better: 0.3 → Excellent, 0.7 → Trop nul.
         """
+        print(f"difficulty penalty: {self.difficulty_penalty}")
+        
         # Clip to range
         score_clipped = np.clip(score, min_score, max_score)
 
@@ -177,13 +187,13 @@ class Visualizer:
         norm = (max_score - score_clipped) / (max_score - min_score)
 
         # Map to text
-        if norm < 0.3:
+        if norm < 0.3 + self.difficulty_penalty:
             return "Trop nul"
-        elif norm < 0.6:
+        elif norm < 0.6 + self.difficulty_penalty:
             return "Faible"
-        elif norm < 0.75:
+        elif norm < 0.75 + self.difficulty_penalty:
             return "Moyen"
-        elif norm < 0.9:
+        elif norm < 0.9 + self.difficulty_penalty:
             return "Bon"
         else:
             return "Excellent"
