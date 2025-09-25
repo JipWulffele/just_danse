@@ -11,7 +11,7 @@ DANCES = {
         "audio": "assets/audio/de_kabouter_dans_short.mp3",
         "icon_path": "assets/config/icon_schedule.json",
         "webcam_rotation": -90,
-        "ref_video_rotation": -90,
+        #"ref_video_rotation": -90,
     },
     "Old Dance": {
         "ref_video": "assets/video/reference.webm",
@@ -19,7 +19,7 @@ DANCES = {
         "audio": "assets/audio/de_kabouter_dans_ultra_short_2.mp3",
         "icon_path": "assets/config/icon_schedule_old.json",
         "webcam_rotation": 90,
-        "ref_video_rotation": -90,
+        #"ref_video_rotation": -90,
     },
 }
 
