@@ -59,7 +59,7 @@ if start_button:
 if st.session_state.dance_running:
     dance_session = DanceSession(DANCES[dance_choice],
                                   STICKER, icon_data=icon_data,
-                                  frame_window=FRAME_WINDOW)
+                                  frame_window=FRAME_WINDOW, difficulty_levels=difficulty)
 
     detected, frame = dance_session.wait_for_person_and_countdown()
 

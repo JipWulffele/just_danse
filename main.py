@@ -23,7 +23,8 @@ FRAME_WIDTH = 1080
 FRAME_HEIGHT = 720
 WEBCAM_ROTATION = -90
 FORCE_FPS = 0 # force frame rate during reference video -> 0 = play at normal speed (25 fps)
-
+# 🔹 New flag
+SAVE_KEYPOINTS = True   # set False if you don't want to save
 
 def main():
 
@@ -34,7 +35,7 @@ def main():
     video.set_target_size(width=FRAME_WIDTH, height=FRAME_HEIGHT)
     
     reference = VideoHandler(source=REF_VIDEO)
-    reference.set_rotation(-90)
+    reference.set_rotation(WEBCAM_ROTATION)
     reference.set_target_size(width=FRAME_WIDTH, height=FRAME_HEIGHT)
 
     audio_player = AudioSyncPlayer(AUDIO_PATH)
@@ -48,6 +49,10 @@ def main():
     visualizer = Visualizer()
     
     icon_data = load_icons(ICON_PATH)
+
+    if SAVE_KEYPOINTS:
+        # 🔹 Storage for user keypoints
+        user_keypoints_seq = []
 
     # Show a sticker every 2 s
     last_sticker_time = 0    # timestamp of last sticker shown
@@ -127,12 +132,16 @@ def main():
                     if key == ord('q'):
                         video.release()
                         reference.release()
+                        # 🔹 Save user keypoints if enabled
+                        if SAVE_KEYPOINTS and len(user_keypoints_seq) > 0:
+                            np.savez("assets/keypoints/user_session.npz", keypoints=np.array(user_keypoints_seq))
+                            print("User keypoints saved to assets/keypoints/user_session.npz")
                         return
                     elif key == ord('d'):
                         # Restart reference video
                         reference.release()
                         reference = VideoHandler(source=REF_VIDEO)
-                        reference.set_rotation(-90)
+                        reference.set_rotation(WEBCAM_ROTATION)
                         reference.set_target_size(width=FRAME_WIDTH, height=FRAME_HEIGHT)
                         # Restart sticker
                         last_sticker_time = 0   
@@ -149,6 +158,10 @@ def main():
             if results.pose_landmarks:
                 score, stage = judge.update(results.pose_landmarks.landmark, expected_idx=expected_idx, method=METHOD) # prend expected_idx
                 frame = detector.draw(frame, results)
+                # 🔹 Collect keypoints if enabled
+                if SAVE_KEYPOINTS:
+                    user_kp = np.array([[lm.x, lm.y, lm.z] for lm in results.pose_landmarks.landmark])
+                    user_keypoints_seq.append(user_kp)
 
             # PiP webcam
             ref_frame = visualizer.overlay_pip(ref_frame, frame, size=(300,200))
@@ -185,6 +198,10 @@ def main():
             if video.should_quit('q'):
                 video.release()
                 reference.release()
+                # 🔹 Save user keypoints if enabled
+                if SAVE_KEYPOINTS and len(user_keypoints_seq) > 0:
+                    np.savez("assets/keypoints/user_session_unicorn.npz", keypoints=np.array(user_keypoints_seq))
+                    print("User keypoints saved to assets/keypoints/user_session_unicorn.npz")
                 return
 
 if __name__ == "__main__":
