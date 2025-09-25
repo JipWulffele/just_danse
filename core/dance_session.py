@@ -7,7 +7,7 @@ from utils.utils_streamlit import countdown, load_icons
 
 from core.video_handler import VideoHandler
 from core.pose_detector import PoseDetector
-from core.visualizer import Visualizer
+from core.visualizer_different_levels import Visualizer
 from core.ecran import Ecran
 from core.dance_judge import DanceJudge
 from core.audio_player import AudioSyncPlayer
@@ -15,7 +15,7 @@ from core.audio_player import AudioSyncPlayer
 from src.features_extraction import FeaturesExtraction
 
 class DanceSession:
-    def __init__(self, dance_config, sticker_config, icon_data=None, source=0, frame_window=None):
+    def __init__(self, dance_config, sticker_config, icon_data=None, source=0, frame_window=None, difficulty_levels='Medium'):
         self.dance_config = dance_config
         self.sticker_config = sticker_config
         self.icon_data = icon_data
@@ -29,7 +29,7 @@ class DanceSession:
         ref_keypoints_seq = data["keypoints"]
         self.judge = DanceJudge(ref_keypoints_seq, shifts=[0,5,10,14,16,18,20], angle_deg=dance_config["webcam_rotation"])
         
-        self.visualizer = Visualizer()
+        self.visualizer = Visualizer(difficulty_levels=difficulty_levels)
         self.ecran = Ecran()
         self.chut_detector = FeaturesExtraction()
         
