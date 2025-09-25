@@ -101,7 +101,7 @@ class DanceSession:
             loop_start = time.time() # keep track of time
             elapsed = time.time() - start_time # total elapsed time
             expected_idx = int(elapsed / self.frame_duration)
-            
+
             if expected_idx > ref_frame_idx:
                 # Advance as many frames as needed
                 while ref_frame_idx < expected_idx:
