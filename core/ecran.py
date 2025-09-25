@@ -35,7 +35,7 @@ class Ecran():
 
             # Redimensionner et coller
             img = cv2.resize(img, (200, 200))
-            # Convertir en HSV pour mieux détecter اللون
+            # Convertir en HSV pour mieux détecter 
             hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
             # Définir plage de couleur à changer (par exemple teintes sombres/bleues)
@@ -49,6 +49,32 @@ class Ecran():
             frame_start[0:200, 0:200] = img
         else:
             print(f"⚠️ Image non trouvée à : {image_path}")
+
+        # Deuxième image à l'opposé (bas à droite)
+        image_path2 = "./assets/img_jamila/Image2.png"  # Mets ici le chemin de la 2e image assets/img_jamila/Image collée (2).png
+
+        img2 = cv2.imread(image_path2, cv2.IMREAD_UNCHANGED)
+
+        if img2 is not None:
+            if img2.shape[2] == 4:
+                r, g, b, a = cv2.split(img2)
+                white_bg = np.ones_like(a, dtype=np.uint8) * 255
+                b = cv2.bitwise_or(b, white_bg, mask=cv2.bitwise_not(a))
+                g = cv2.bitwise_or(g, white_bg, mask=cv2.bitwise_not(a))
+                r = cv2.bitwise_or(r, white_bg, mask=cv2.bitwise_not(a))
+                img2 = cv2.merge((r, g, b))
+
+            img2 = cv2.resize(img2, (200, 200))
+            hsv2 = cv2.cvtColor(img2, cv2.COLOR_BGR2HSV)
+            lower = np.array([0, 0, 0])
+            upper = np.array([150, 255, 100])
+            mask2 = cv2.inRange(hsv2, lower, upper)
+            img2[mask2 > 0] = [0, 0, 255]  # rouge
+
+            # Coller l'image en bas à droite
+            frame_start[-200:, -200:] = img2
+        else:
+            print(f"⚠️ Deuxième image non trouvée à : {image_path2}")
 
         # Liste des pronoms
         titre = "Just dance: ACV special"
