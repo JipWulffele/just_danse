@@ -26,12 +26,12 @@ cd just_danse
 ```
 ### 2. Créer un environnement
 ```bash
-conda env create -f envirornment.yml
-conda activate tf-env
+conda env create -f environment.yml
+conda activate dance-env
 ```
 ### 3. Exécuter le programme
 ```bash
-python main.py
+streamlit run streamlit_app.py
 ```
 
 ---
