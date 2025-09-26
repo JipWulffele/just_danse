@@ -42,7 +42,7 @@ class DanceSession:
         self.ref_video.set_rotation(dance_config["webcam_rotation"])
         self.ref_video.set_target_size(width=1080, height=720)
         self.audio_player = AudioSyncPlayer(dance_config["audio"])
-        self.fps = 20 # dance_config["FPS"]# very important!!! should match ref video or music will be out of sync
+        self.fps = dance_config["FPS"]# very important!!! should match ref video or music will be out of sync
         self.frame_duration = 1.0 / self.fps
 
         self.fall_detection = fall_detection
@@ -106,7 +106,7 @@ class DanceSession:
             loop_start = time.time() # keep track of time
             elapsed = time.time() - start_time # total elapsed time
             expected_idx = int(elapsed / self.frame_duration)
-            print(f"idx: {expected_idx}")
+            #print(f"idx: {expected_idx}")
 
             if expected_idx > ref_frame_idx:
                 # Advance as many frames as needed
