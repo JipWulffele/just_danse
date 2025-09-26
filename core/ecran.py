@@ -111,20 +111,139 @@ class Ecran():
                 reference.release()
                 return
             cv2.waitKey(1) 
+     
+    def get_ecran_chute(self, size=(1080, 720)):
         
+        width, height = size
+
+        # Create a white background image
+        frame_chute = np.ones((height, width, 3), dtype=np.uint8) * 255   
+        titre = "Alerte : Chute"
+        cv2.putText(frame_chute, titre, (400,100), 
+                        fontFace=cv2.FONT_HERSHEY_SIMPLEX, 
+                        fontScale=1, 
+                        color=(0, 0, 255), 
+                        thickness=3) 
+        
+        #  image de chute
+        
+        image_path3 = "./assets/img_jamila/Image3.png"  
+        img3 = cv2.imread(image_path3, cv2.IMREAD_UNCHANGED)
+        if img3 is not None:
+            if img3.shape[2] == 4:
+                # Supprimer la transparence et remplacer par un fond blanc
+                r, g, b, a = cv2.split(img3)
+                white_bg = np.ones_like(a, dtype=np.uint8) * 255
+                b = cv2.bitwise_or(b, white_bg, mask=cv2.bitwise_not(a))
+                g = cv2.bitwise_or(g, white_bg, mask=cv2.bitwise_not(a))
+                r = cv2.bitwise_or(r, white_bg, mask=cv2.bitwise_not(a))
+                img3 = cv2.merge((r, g, b))
+
+            # Redimensionner l’image
+            img3 = cv2.resize(img3, (200, 200))
+
+            
+
+            # Positionner au centre de frame_chute
+            h, w = frame_chute.shape[:2]
+            y_offset = h // 2 - 100  # 200/2
+            x_offset = w // 2 - 100
+
+            # Coller l'image centrée
+            frame_chute[y_offset:y_offset+200, x_offset:x_offset+200] = img3
+        else:
+            print(f"⚠️ Troisième image non trouvée à : {image_path3}")
+
+
+    def get_ecran_chute2(self, size=(1080, 720)):
+
+        width, height = size
+
+        # Create a white background image
+        frame_chute = np.ones((height, width, 3), dtype=np.uint8) * 255   
+        titre = "Alerte : Chute"
+        cv2.putText(frame_chute, titre, (400,100), 
+                        fontFace=cv2.FONT_HERSHEY_SIMPLEX, 
+                        fontScale=1, 
+                        color=(0, 0, 255), 
+                        thickness=3) 
+        
+        # image de chute
+        image_path3 = "./assets/img_jamila/Image3.png"  
+        img3 = cv2.imread(image_path3, cv2.IMREAD_UNCHANGED)
+
+        if img3 is not None:
+            # Resize
+            img3 = cv2.resize(img3, (200, 200))
+
+            # Get center position
+            h, w = frame_chute.shape[:2]
+            y_offset = h // 2 - 100
+            x_offset = w // 2 - 100
+
+            # If the image has alpha channel (4th channel)
+            if img3.shape[2] == 4:
+                # Split channels
+                b, g, r, a = cv2.split(img3)
+
+                # Create 3-channel image and alpha mask
+                img_rgb = cv2.merge((b, g, r))
+                mask = cv2.merge((a, a, a)) / 255.0  # Normalize alpha to [0,1]
+
+                # Get ROI from background
+                roi = frame_chute[y_offset:y_offset+200, x_offset:x_offset+200].astype(float)
+
+                # Blend the image with ROI using alpha mask
+                blended = (img_rgb * mask + roi * (1 - mask)).astype(np.uint8)
+
+                # Replace region in frame_chute
+                frame_chute[y_offset:y_offset+200, x_offset:x_offset+200] = blended
+            else:
+                # No alpha channel, just paste the image directly
+                frame_chute[y_offset:y_offset+200, x_offset:x_offset+200] = img3
+        else:
+            print(f"⚠️ Troisième image non trouvée à : {image_path3}")
+
+
+        # img3 = cv2.imread(image_path3, cv2.IMREAD_UNCHANGED)
+
+        # if img3 is not None:
+        #     if img3.shape[2] == 4:
+        #         r, g, b, a = cv2.split(img3)
+        #         white_bg = np.ones_like(a, dtype=np.uint8) * 255
+        #         b = cv2.bitwise_or(b, white_bg, mask=cv2.bitwise_not(a))
+        #         g = cv2.bitwise_or(g, white_bg, mask=cv2.bitwise_not(a))
+        #         r = cv2.bitwise_or(r, white_bg, mask=cv2.bitwise_not(a))
+        #         img3 = cv2.merge((r, g, b))
+
+        #     img3 = cv2.resize(img3, (200, 200))
+        #     hsv3 = cv2.cvtColor(img3, cv2.COLOR_BGR2HSV)
+        #     lower = np.array([0, 0, 0])
+        #     upper = np.array([150, 255, 100])
+        #     mask3 = cv2.inRange(hsv3, lower, upper)
+        #     img3[mask3 > 0] = [0, 0, 255]  # rouge
+
+        #     # Coller l'image en bas à droite
+        #     frame_chute[-200:, -200:] = img3
+        # else:
+        #     print(f"⚠️ Deuxième image non trouvée à : {image_path3}")
+        return frame_chute   
         
 if __name__ == "__main__":
     ecran = Ecran()
-    frame = ecran.get_ecran_start()
+    #frame = ecran.get_ecran_start()
+    frame = ecran.get_ecran_chute2()
+
     # imshow frame
 
 
     # Option 1: Use OpenCV to display
-    cv2.namedWindow("Just Danse", cv2.WINDOW_NORMAL)
+    #cv2.namedWindow("Just Danse", cv2.WINDOW_NORMAL)
     #cv2.resizeWindow("Noms sur écran", width, height)
-    
-    cv2.imshow("Just Danse", frame)
-   # cv2.imshow("image")
+    cv2.namedWindow("Alerte : Chute", cv2.WINDOW_NORMAL)
+    #cv2.imshow("Just Danse", frame)
+    cv2.imshow("Alerte : Chute", frame)
+    #cv2.imshow("image3")
     cv2.waitKey(0)
     cv2.destroyAllWindows()
     #Option 2: Use matplotlib (uncomment if preferred)
