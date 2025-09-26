@@ -1,0 +1,70 @@
+{
+  "icons": [
+    {
+      "file": "./images/icon_hand.png",
+      "start_frame": 0,
+      "end_frame": 200,
+      "size": [200, 200]
+    },
+    {
+      "file": "./images/icon_step.png",
+      "start_frame": 200,
+      "end_frame": 300,
+      "size": [200, 200]
+    },
+    {
+      "file": "./images/icon_hand_squat.png",
+      "start_frame": 300,
+      "end_frame": 350,
+      "size": [200, 200]
+    },
+    {
+      "file": "./images/icon_step.png",
+      "start_frame": 350,
+      "end_frame": 450,
+      "size": [200, 200]
+    },
+    {
+      "file": "./images/icon_hand_squat.png",
+      "start_frame": 450,
+      "end_frame": 500,
+      "size": [200, 200]
+    },
+    {
+      "file": "./images/icon_step90.png",
+      "start_frame": 500,
+      "end_frame": 640,
+      "size": [200, 200]
+    },
+    {
+      "file": "./images/icon_hand_squat90.png",
+      "start_frame": 640,
+      "end_frame": 690,
+      "size": [200, 200]
+    },
+    {
+      "file": "./images/icon_step90.png",
+      "start_frame": 690,
+      "end_frame": 820,
+      "size": [200, 200]
+    },
+    {
+      "file": "./images/icon_hand_squat90.png",
+      "start_frame": 820,
+      "end_frame": 880,
+      "size": [200, 200]
+    },
+    {
+      "file": "./images/icon_step90.png",
+      "start_frame": 880,
+      "end_frame": 980,
+      "size": [200, 200]
+    },
+    {
+      "file": "./images/icon_hand_squat90.png",
+      "start_frame": 980,
+      "end_frame": 1100,
+      "size": [200, 200]
+    }
+  ]
+}

@@ -26,7 +26,7 @@ DANCES = {
         "ref_video": "assets/video/dabca.webm",
         "ref_keypoints": "assets/keypoints/keypoints_reference_dabca.npz",
         "audio": "assets/audio/dabca_music.mp3",
-        "icon_path": "assets/config/icon_schedule_old.json",
+        "icon_path": "assets/config/icon_schedule_dabke_1p.json",
         "webcam_rotation": -90,
         "FPS": 30,
     },
@@ -34,7 +34,7 @@ DANCES = {
         "ref_video": "assets/video/dabke_2p_crop.webm",
         "ref_keypoints": "assets/keypoints/keypoints_reference_dabca.npz",
         "audio": "assets/audio/dabke_music_crop.mp3",
-        "icon_path": "assets/config/icon_schedule_old.json",
+        "icon_path": "assets/config/icon_schedule_dabke_2p.json",
         "webcam_rotation": 0,
         "FPS": 20,
     },
@@ -42,7 +42,7 @@ DANCES = {
         "ref_video": "assets/video/italian_1p_crop.webm",
         "ref_keypoints": "assets/keypoints/keypoints_reference_dabca.npz",
         "audio": "assets/audio/italian_music_crop.mp3",
-        "icon_path": "assets/config/icon_schedule_old.json",
+        "icon_path": "assets/config/icon_schedule_italian_1p.json",
         "webcam_rotation": 0,
         "FPS": 20,
     },
@@ -50,7 +50,7 @@ DANCES = {
         "ref_video": "assets/video/italian_crop.webm",
         "ref_keypoints": "assets/keypoints/keypoints_reference_dabca.npz",
         "audio": "assets/audio/italian_music_crop.mp3",
-        "icon_path": "assets/config/icon_schedule_old.json",
+        "icon_path": "assets/config/icon_schedule_italian_2p.json",
         "webcam_rotation": 0,
         "FPS": 20,
     },
@@ -62,9 +62,6 @@ STICKER = {"last_sticker_duration": 0,
            "sticker_duration": 1.5,
            "current_sticker_score": 0,
            "last_sticker_time": 0}
-
-ICON_PATH = "assets/config/icon_schedule.json"
-icon_data = load_icons(ICON_PATH)
 
 SOURCE = 0
 
@@ -94,7 +91,7 @@ if start_button:
 
 if st.session_state.dance_running:
     dance_session = DanceSession(DANCES[dance_choice],
-                                 STICKER, icon_data=icon_data,
+                                 STICKER, 
                                  source=SOURCE,
                                  frame_window=FRAME_WINDOW,
                                  difficulty_levels=difficulty,
