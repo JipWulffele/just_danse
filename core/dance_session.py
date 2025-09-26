@@ -126,8 +126,9 @@ class DanceSession:
                 self.chut_detector.compute_feature_from_frame(cv2.cvtColor(cam_frame, cv2.COLOR_BGR2RGB))
                 fall_state, _, _, _, _, _ = self.chut_detector.frame_to_state()
                 if fall_state == True:
-                    cam_frame = np.full((720, 1080, 3), 255, dtype=np.uint8)
-                    cam_frame  = self.visualizer.draw_text(cam_frame, "Fall detected")
+                    #cam_frame = np.full((720, 1080, 3), 255, dtype=np.uint8)
+                    #cam_frame  = self.visualizer.draw_text(cam_frame, "Fall detected")
+                    cam_frame = self.ecran.get_ecran_chute2()
                     self.frame_window.image(cv2.cvtColor(cam_frame, cv2.COLOR_BGR2RGB))
                     break
 
