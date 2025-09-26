@@ -13,6 +13,7 @@ DANCES = {
         "icon_path": "assets/config/icon_schedule.json",
         "webcam_rotation": -90,
         "FPS": 30,
+        "scoring": True,
     },
     "Not unicorn dance": {
         "ref_video": "assets/video/reference.webm",
@@ -21,6 +22,7 @@ DANCES = {
         "icon_path": "assets/config/icon_schedule_old.json",
         "webcam_rotation": 90,
         "FPS": 25,
+        "scoring": True,
     },
     "Dabke (1 pers.)": {
         "ref_video": "assets/video/dabca.webm",
@@ -29,6 +31,7 @@ DANCES = {
         "icon_path": "assets/config/icon_schedule_dabke_1p.json",
         "webcam_rotation": -90,
         "FPS": 30,
+        "scoring": True,
     },
     "Dabke (2 pers.)": {
         "ref_video": "assets/video/dabke_2p_crop.webm",
@@ -37,14 +40,16 @@ DANCES = {
         "icon_path": "assets/config/icon_schedule_dabke_2p.json",
         "webcam_rotation": 0,
         "FPS": 20,
+        "scoring": False,
     },
     "Italian dance (1 pers.)": {
         "ref_video": "assets/video/italian_1p_crop.webm",
-        "ref_keypoints": "assets/keypoints/keypoints_reference_dabca.npz",
+        "ref_keypoints": "assets/keypoints/keypoints_reference_quaqua1p.npz",
         "audio": "assets/audio/italian_music_crop.mp3",
         "icon_path": "assets/config/icon_schedule_italian_1p.json",
         "webcam_rotation": 0,
         "FPS": 20,
+        "scoring": True,
     },
     "Italian dance (2 pers.)": {
         "ref_video": "assets/video/italian_crop.webm",
@@ -53,6 +58,7 @@ DANCES = {
         "icon_path": "assets/config/icon_schedule_italian_2p.json",
         "webcam_rotation": 0,
         "FPS": 20,
+        "scoring": False,
     },
 }
 
@@ -64,6 +70,9 @@ STICKER = {"last_sticker_duration": 0,
            "last_sticker_time": 0}
 
 SOURCE = 0
+
+WIDTH, HEIGHT = 1080, 760 #2160, 1520
+st.set_page_config(layout="wide")
 
 # Initialize state variables
 if "dance_running" not in st.session_state:
@@ -78,11 +87,11 @@ fall_detection = st.sidebar.selectbox("Fall detection:", ["Off", "On"])
 start_button = st.sidebar.button("Start Dance")
 
 # ---------- Main panel
-FRAME_WINDOW = st.image([])
+FRAME_WINDOW = st.image([], width=1920)
 
 # ecran de depart
 ecran = Ecran() # Start screen
-start_screen_frame = ecran.get_ecran_start(size=(1080, 720))
+start_screen_frame = ecran.get_ecran_start(size=(WIDTH, HEIGHT))
 FRAME_WINDOW.image(cv2.cvtColor(start_screen_frame , cv2.COLOR_BGR2RGB))
 
 if start_button:

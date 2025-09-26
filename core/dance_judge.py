@@ -21,7 +21,7 @@ class DanceJudge:
         # State
         self.frame_idx = 0
         self.best_shift = None
-        self.score = None
+        self.score = 0.3
         self.scale_x_u = None
         self.scale_x_r = None
         self.scale_y = None

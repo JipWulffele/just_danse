@@ -119,27 +119,25 @@ class DanceSession:
             else:
                 ref_frame = last_ref_frame
 
-            #ref_frame = self.ref_video.get_frame()
             cam_frame = self.video.get_frame()
             # Check for chut
             if self.fall_detection == "On":
                 self.chut_detector.compute_feature_from_frame(cv2.cvtColor(cam_frame, cv2.COLOR_BGR2RGB))
                 fall_state, _, _, _, _, _ = self.chut_detector.frame_to_state()
                 if fall_state == True:
-                    cam_frame = np.full((720, 1080, 3), 255, dtype=np.uint8)
-                    cam_frame  = self.visualizer.draw_text(cam_frame, "Fall detected")
+                    cam_frame = self.ecran.get_ecran_chute2()
                     self.frame_window.image(cv2.cvtColor(cam_frame, cv2.COLOR_BGR2RGB))
                     break
-
 
             if ref_frame is None or cam_frame is None:
                 break
 
             # Detection and judging
-            results = self.detector.detect(cam_frame)
-            if results.pose_landmarks:
-                score, stage = self.judge.update(results.pose_landmarks.landmark, expected_idx=expected_idx, method="distance") # prend expected_idx
-                cam_frame = self.detector.draw(cam_frame, results)
+            if self.dance_config["scoring"]:
+                results = self.detector.detect(cam_frame)
+                if results.pose_landmarks:
+                    score, stage = self.judge.update(results.pose_landmarks.landmark, expected_idx=expected_idx, method="distance") # prend expected_idx
+                    cam_frame = self.detector.draw(cam_frame, results)
 
             # PiP webcam
             ref_frame = self.visualizer.overlay_pip(ref_frame, cam_frame, size=(300,200))
