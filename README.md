@@ -1,4 +1,4 @@
-# 💃 Just_Danse
+# 💃 Just Danse
 ## 🤖 Cours de danse gamifié avec MediaPipe & OpenCV
 
 Ce projet utilise **MediaPipe** et **OpenCV** pour détecter les poses du corps en temps réel à partir d'une webcam et les comparer à une **vidéo de référence de danse**.  
