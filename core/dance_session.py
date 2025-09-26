@@ -15,9 +15,12 @@ from core.audio_player import AudioSyncPlayer
 from src.features_extraction import FeaturesExtraction
 
 class DanceSession:
-    def __init__(self, dance_config, sticker_config, icon_data=None, source=0, frame_window=None, difficulty_levels='Medium', fall_detection="On"):
+    def __init__(self, dance_config, sticker_config, source=0, frame_window=None, difficulty_levels='Medium', fall_detection="On"):
         self.dance_config = dance_config
         self.sticker_config = sticker_config
+
+
+        icon_data = load_icons(dance_config["icon_path"])
         self.icon_data = icon_data
         
         self.video = VideoHandler(source)
@@ -39,7 +42,7 @@ class DanceSession:
         self.ref_video.set_rotation(dance_config["webcam_rotation"])
         self.ref_video.set_target_size(width=1080, height=720)
         self.audio_player = AudioSyncPlayer(dance_config["audio"])
-        self.fps = dance_config["FPS"]# very important!!! should match ref video or music will be out of sync
+        self.fps = 20 # dance_config["FPS"]# very important!!! should match ref video or music will be out of sync
         self.frame_duration = 1.0 / self.fps
 
         self.fall_detection = fall_detection
@@ -103,7 +106,8 @@ class DanceSession:
             loop_start = time.time() # keep track of time
             elapsed = time.time() - start_time # total elapsed time
             expected_idx = int(elapsed / self.frame_duration)
-            
+            print(f"idx: {expected_idx}")
+
             if expected_idx > ref_frame_idx:
                 # Advance as many frames as needed
                 while ref_frame_idx < expected_idx:
