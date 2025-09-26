@@ -15,7 +15,7 @@ from core.audio_player import AudioSyncPlayer
 from src.features_extraction import FeaturesExtraction
 
 class DanceSession:
-    def __init__(self, dance_config, sticker_config, icon_data=None, source=0, frame_window=None, difficulty_levels='Medium'):
+    def __init__(self, dance_config, sticker_config, icon_data=None, source=0, frame_window=None, difficulty_levels='Medium', fall_detection="On"):
         self.dance_config = dance_config
         self.sticker_config = sticker_config
         self.icon_data = icon_data
@@ -39,8 +39,10 @@ class DanceSession:
         self.ref_video.set_rotation(dance_config["webcam_rotation"])
         self.ref_video.set_target_size(width=1080, height=720)
         self.audio_player = AudioSyncPlayer(dance_config["audio"])
-        self.fps = self.ref_video.cap.get(cv2.CAP_PROP_FPS) # very important!!! should match ref video or music will be out of sync
+        self.fps = dance_config["FPS"]# very important!!! should match ref video or music will be out of sync
         self.frame_duration = 1.0 / self.fps
+
+        self.fall_detection = fall_detection
 
 
     def wait_for_person_and_countdown(self, countdown_seconds=3):
@@ -101,7 +103,7 @@ class DanceSession:
             loop_start = time.time() # keep track of time
             elapsed = time.time() - start_time # total elapsed time
             expected_idx = int(elapsed / self.frame_duration)
-
+            
             if expected_idx > ref_frame_idx:
                 # Advance as many frames as needed
                 while ref_frame_idx < expected_idx:
@@ -116,13 +118,14 @@ class DanceSession:
             #ref_frame = self.ref_video.get_frame()
             cam_frame = self.video.get_frame()
             # Check for chut
-            self.chut_detector.compute_feature_from_frame(cv2.cvtColor(cam_frame, cv2.COLOR_BGR2RGB))
-            fall_state, _, _, _, _, _ = self.chut_detector.frame_to_state()
-            if fall_state == True:
-                cam_frame = np.full((720, 1080, 3), 255, dtype=np.uint8)
-                cam_frame  = self.visualizer.draw_text(cam_frame, "Fall detected")
-                self.frame_window.image(cv2.cvtColor(cam_frame, cv2.COLOR_BGR2RGB))
-                break
+            if self.fall_detection == "On":
+                self.chut_detector.compute_feature_from_frame(cv2.cvtColor(cam_frame, cv2.COLOR_BGR2RGB))
+                fall_state, _, _, _, _, _ = self.chut_detector.frame_to_state()
+                if fall_state == True:
+                    cam_frame = np.full((720, 1080, 3), 255, dtype=np.uint8)
+                    cam_frame  = self.visualizer.draw_text(cam_frame, "Fall detected")
+                    self.frame_window.image(cv2.cvtColor(cam_frame, cv2.COLOR_BGR2RGB))
+                    break
 
 
             if ref_frame is None or cam_frame is None:
@@ -166,7 +169,7 @@ class DanceSession:
         self.ref_video.release()
 
         # Display final score overlay
-        if fall_state == False:
+        if (self.fall_detection == "On" and fall_state == False) or (self.fall_detection == "Off"):
             cam_frame = np.full((720, 1080, 3), 255, dtype=np.uint8)
             final_frame = self.visualizer.draw_end_message(cam_frame, text=self.judge.score, restart_message=False)
 
