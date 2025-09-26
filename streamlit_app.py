@@ -6,7 +6,7 @@ from core.ecran import Ecran
 
 # ---------- Dances config
 DANCES = {
-    "Unicorn Dance": {
+    "Unicorn Dance (1 pers.)": {
         "ref_video": "assets/video/reference_unicorn.webm",
         "ref_keypoints": "assets/keypoints/keypoints_reference_unicorn.npz",
         "audio": "assets/audio/de_kabouter_dans_short.mp3",
@@ -15,7 +15,7 @@ DANCES = {
         "FPS": 30,
         "scoring": True,
     },
-    "Not unicorn dance": {
+    "Not unicorn dance (1 pers.)": {
         "ref_video": "assets/video/reference.webm",
         "ref_keypoints": "assets/keypoints/keypoints_reference1.npz",
         "audio": "assets/audio/de_kabouter_dans_ultra_short_2.mp3",
@@ -42,7 +42,7 @@ DANCES = {
         "FPS": 20,
         "scoring": False,
     },
-    "Italian dance (1 pers.)": {
+    "Italian dance (1 pers.)": { # only works when filming far away...
         "ref_video": "assets/video/italian_1p_crop.webm",
         "ref_keypoints": "assets/keypoints/keypoints_reference_quaqua1p.npz",
         "audio": "assets/audio/italian_music_crop.mp3",
@@ -71,8 +71,8 @@ STICKER = {"last_sticker_duration": 0,
 
 SOURCE = 0
 
-WIDTH, HEIGHT = 1080, 760 #2160, 1520
-st.set_page_config(layout="wide")
+WIDTH, HEIGHT = 1080, 760
+st.set_page_config(layout="wide") # big screen is better !
 
 # Initialize state variables
 if "dance_running" not in st.session_state:
@@ -84,7 +84,7 @@ dance_choice = st.sidebar.selectbox("Choose your dance:", list(DANCES.keys()))
 difficulty = st.sidebar.selectbox("Difficulty:", ["Easy", "Medium", "Hard"])
 fall_detection = st.sidebar.selectbox("Fall detection:", ["Off", "On"])
 
-start_button = st.sidebar.button("Start Dance")
+start_button = st.sidebar.button("Start Dancing")
 
 # ---------- Main panel
 FRAME_WINDOW = st.image([], width=1920)
