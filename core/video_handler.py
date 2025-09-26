@@ -66,7 +66,7 @@ class VideoHandler:
         M[1, 2] += (new_h / 2) - center[1]
 
         # Rotate the image
-        rotated = cv2.warpAffine(frame, M, (new_w, new_h), borderValue=(0,0,0))
+        rotated = cv2.warpAffine(frame, M, (new_w, new_h), borderValue=(255, 255, 255))
         return rotated
     
 
@@ -88,13 +88,13 @@ class VideoHandler:
         if target_width is not None and new_w < target_width:
             pad_left = (target_width - new_w) // 2
             pad_right = target_width - new_w - pad_left
-            resized = cv2.copyMakeBorder(resized, 0, 0, pad_left, pad_right, cv2.BORDER_CONSTANT, value=(0,0,0))
+            resized = cv2.copyMakeBorder(resized, 0, 0, pad_left, pad_right, cv2.BORDER_CONSTANT, value=(255, 255, 255))
         # Pad height if needed (e.g., for very wide videos)
         h_resized = resized.shape[0]
         w_resized = resized.shape[1]
         if h_resized < target_height:
             pad_top = (target_height - h_resized) // 2
             pad_bottom = target_height - h_resized - pad_top
-            resized = cv2.copyMakeBorder(resized, pad_top, pad_bottom, 0, 0, cv2.BORDER_CONSTANT, value=(0,0,0))
+            resized = cv2.copyMakeBorder(resized, pad_top, pad_bottom, 0, 0, cv2.BORDER_CONSTANT, value=(255, 255, 255))
 
         return resized

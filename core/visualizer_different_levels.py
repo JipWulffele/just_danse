@@ -47,48 +47,78 @@ class Visualizer:
     def draw_end_message(self, frame, text=None, restart_message=True):
         h, w, _ = frame.shape
 
+        if text:
+            score_str = self.score_to_text(text)
+
+        # color based on score
+        if score_str == "Excellent":
+            bg_color = (153, 0, 57)
+        elif score_str == "Bon":
+            bg_color = (89, 0, 158)
+        elif score_str == "Moyen":
+            bg_color = (84, 0, 255)
+        elif score_str == "Faible":
+            bg_color = (0, 84, 255)
+        else:
+            bg_color = (0, 189, 255)
+
         # --- Semi-transparent overlay ---
         overlay = frame.copy()
-        cv2.rectangle(overlay, (50, 50), (w-50, h-50), (84, 0, 255), -1)
-        alpha = 0.6
+        cv2.rectangle(overlay, (50, 50), (w-50, h-50), (0, 0, 255), -1)
+        alpha = 0
         frame = cv2.addWeighted(overlay, alpha, frame, 1 - alpha, 0)
 
         # --- Festive border ---
-        cv2.rectangle(frame, (40, 40), (w-40, h-40), (0, 189, 255), 10)
+        cv2.rectangle(frame, (40, 40), (w-40, h-40), bg_color, 10)
 
         font = cv2.FONT_HERSHEY_SIMPLEX
         thickness = 4
-        max_width = w - 200  # max width inside rectangle
-        font_scale = 2.5     # initial guess
+        max_width = w - 200
 
         if text:
-            text = self.score_to_text(text)
-            score_text = f"Your Score: {text}"
-            
-            # Reduce font_scale until text fits
-            (text_w, text_h), baseline = cv2.getTextSize(score_text, font, font_scale, thickness)
-            while text_w > max_width and font_scale > 0.5:
-                font_scale -= 0.1
-                (text_w, text_h), baseline = cv2.getTextSize(score_text, font, font_scale, thickness)
+            # --- First line: "Final Score:" ---
+            label = "Final Score:"
+            label_scale = 2.0
+            (label_w, label_h), _ = cv2.getTextSize(label, font, label_scale, thickness)
+            while label_w > max_width and label_scale > 0.5:
+                label_scale -= 0.1
+                (label_w, label_h), _ = cv2.getTextSize(label, font, label_scale, thickness)
 
-            # Draw shadow/outline
-            cv2.putText(frame, score_text, (100, 150), font, font_scale, (255, 255, 255), thickness+2, cv2.LINE_AA)
-            # Draw main text
-            cv2.putText(frame, score_text, (100, 150), font, font_scale, (153, 0, 57), thickness, cv2.LINE_AA)
+            x_label = (w - label_w) // 2
+            y_label = (h // 2) - 50  # center a bit upward
 
-        # Festive message below
+            cv2.putText(frame, label, (x_label, y_label), font, label_scale,
+                        (0, 0, 0), thickness, cv2.LINE_AA)
+
+            # --- Second line: the score itself ---
+            score_scale = 3.0
+            (score_w, score_h), _ = cv2.getTextSize(score_str, font, score_scale, thickness)
+            while score_w > max_width and score_scale > 0.5:
+                score_scale -= 0.1
+                (score_w, score_h), _ = cv2.getTextSize(score_str, font, score_scale, thickness)
+
+            x_score = (w - score_w) // 2
+            y_score = y_label + score_h + 40  # below the label with spacing
+
+            cv2.putText(frame, score_str, (x_score, y_score), font, score_scale,
+                        bg_color, thickness+2, cv2.LINE_AA)
+
         if restart_message:
             message = "Press 'q' to quit | Press 'd' to dance again"
             msg_font_scale = 1.2
             (msg_w, msg_h), _ = cv2.getTextSize(message, font, msg_font_scale, 3)
-            # Optionally shrink message if too wide
             while msg_w > w - 200 and msg_font_scale > 0.5:
                 msg_font_scale -= 0.1
                 (msg_w, msg_h), _ = cv2.getTextSize(message, font, msg_font_scale, 3)
-            cv2.putText(frame, message, (100, h - 100), font, msg_font_scale, (255, 255, 255), 3, cv2.LINE_AA)
+
+            # Centered at bottom
+            x_msg = (w - msg_w) // 2
+            y_msg = h - 80
+            cv2.putText(frame, message, (x_msg, y_msg), font, msg_font_scale,
+                        (0, 0, 0), 3, cv2.LINE_AA)
 
         return frame
-    
+        
     def overlay_pip(self, main_frame, pip_frame, size=(200, 150), margin=20):
         """Overlay webcam stream as picture-in-picture (bottom-left)."""
         pip_resized = cv2.resize(pip_frame, size)
@@ -143,7 +173,19 @@ class Visualizer:
         text_padding = 20   # bigger padding around text
         box_padding = 40    # extra space around the box
         margin = 40
-        bg_color = (153, 0, 57)
+
+        # color based on score
+        if text == "Excellent":
+            bg_color = (153, 0, 57)
+        elif text == "Bon":
+            bg_color = (89, 0, 158)
+        elif text == "Moyen":
+            bg_color = (84, 0, 255)
+        elif text == "Faible":
+            bg_color = (0, 84, 255)
+        else:
+            bg_color = (0, 189, 255)
+
         text_color = (255, 255, 255)
 
         # Measure text size
